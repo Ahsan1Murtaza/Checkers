@@ -102,9 +102,12 @@ class Board:
         if piece is not None:
             self.selectedPiece = piece
             print(f"Piece at ({row}, {col}) is {piece.color}") # Debugging line
+      
         else:
             self.selectedPiece = None
             print(f"No piece at ({row}, {col})") # Debugging line
+
+        
 
     def onRightClick(self, event):
         x = event.x
@@ -113,10 +116,21 @@ class Board:
         col = int(x / TILE_SIZE)
         destination = self.board[row][col]
 
+        if self.selectedPiece is None: # if a piece is selected then we can only move it 
+            return
+        
+
+        
+
         if self.selectedPiece.color is not None: # if a piece is not none specifically color then we can only move it
             if (self.isValidMove(self.selectedPiece, destination)):
+                self.isValidMovement(self.selectedPiece, destination)
+              
+            
                 self.movePiece(self.selectedPiece, destination)
                 self.selectedPiece = None
+            else:
+                print(f"Invalid move from ({self.selectedPiece.row}, {self.selectedPiece.column}) to ({row}, {col})")
           
 
 
@@ -144,6 +158,34 @@ class Board:
 
 
     def isValidMove(self, piece1, destination):
-        return True
+        
+        return self.isValidMovement(piece1, destination)
+    
+
+    # Pieces can only move forward with respect to their positions
+    # can only move diagnally only if there is no piece
+    def isValidMovement(self, piece1, destination):
+        if (piece1.color == "BLACK"):
+            steps = 1
+        elif (piece1.color == "WHITE"):
+            steps = -1
+
+        rowChange = destination.row - piece1.row
+        colChange = destination.column - piece1.column
+
+        
+        rowChange = rowChange * steps
+        
+
+        if ((rowChange == 1) and (colChange == 1 or colChange == -1) and (destination.color == None)):
+            return True
+        
+        print("Invalid Piece Movement")
+
+        return False
+    
+    
+
+
 
       
