@@ -9,6 +9,6 @@ if __name__ == "__main__":
     root.title("Checkers Game")
 
     board = Board(root)
-    board.canvas.bind("<Button-1>", board.onclick)
+    
 
     root.mainloop()
