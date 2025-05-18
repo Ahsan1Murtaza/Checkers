@@ -8,12 +8,14 @@ class Board:
         self.master = master
 
         # Initialize board
-        self.board = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
+        self.board = [[Piece(None, row, col) for col in range(COLUMNS)] for row in range(ROWS)]
         # Create canvas
         self.canvas = tk.Canvas(master, width=COLUMNS * TILE_SIZE, height=ROWS * TILE_SIZE)
         self.canvas.pack()
     
         self.canvas.bind("<Button-1>", self.onclick)
+
+        self.selectedPiece = None
 
         # Draw board
         self.drawBoard()
@@ -23,6 +25,9 @@ class Board:
 
         # Draw pieces
         self.drawPieces()
+
+        # self.movePiece(self.board[0][1], self.board[0][0])
+        # self.movePiece(self.board[2][1], self.board[3][1])
 
 
     def drawBoard(self):
@@ -41,36 +46,36 @@ class Board:
 
     def initializeBoard(self): # Internal method to set up the board
         # Black Pieces
-        self.board[0][1] = Piece("BLACK")
-        self.board[0][3] = Piece("BLACK")
-        self.board[0][5] = Piece("BLACK")
-        self.board[0][7] = Piece("BLACK")
+        self.board[0][1] = Piece("BLACK", 0, 1)
+        self.board[0][3] = Piece("BLACK", 0, 3)
+        self.board[0][5] = Piece("BLACK", 0, 5)
+        self.board[0][7] = Piece("BLACK", 0, 7)
 
-        self.board[1][0] = Piece("BLACK")
-        self.board[1][2] = Piece("BLACK")
-        self.board[1][4] = Piece("BLACK")
-        self.board[1][6] = Piece("BLACK")
+        self.board[1][0] = Piece("BLACK", 1, 0)
+        self.board[1][2] = Piece("BLACK", 1, 2)
+        self.board[1][4] = Piece("BLACK", 1, 4)
+        self.board[1][6] = Piece("BLACK", 1, 6)
 
-        self.board[2][1] = Piece("BLACK")
-        self.board[2][3] = Piece("BLACK")
-        self.board[2][5] = Piece("BLACK")
-        self.board[2][7] = Piece("BLACK")
+        self.board[2][1] = Piece("BLACK", 2, 1)
+        self.board[2][3] = Piece("BLACK", 2, 3)
+        self.board[2][5] = Piece("BLACK", 2, 5)
+        self.board[2][7] = Piece("BLACK", 2, 7)
 
         # White Pieces
-        self.board[5][0] = Piece("WHITE")
-        self.board[5][2] = Piece("WHITE")
-        self.board[5][4] = Piece("WHITE")
-        self.board[5][6] = Piece("WHITE")
+        self.board[5][0] = Piece("WHITE", 5, 0)
+        self.board[5][2] = Piece("WHITE", 5, 2)
+        self.board[5][4] = Piece("WHITE", 5, 4)
+        self.board[5][6] = Piece("WHITE", 5, 6)
 
-        self.board[6][1] = Piece("WHITE")
-        self.board[6][3] = Piece("WHITE")
-        self.board[6][5] = Piece("WHITE")
-        self.board[6][7] = Piece("WHITE")
+        self.board[6][1] = Piece("WHITE", 6, 1)
+        self.board[6][3] = Piece("WHITE", 6, 3)
+        self.board[6][5] = Piece("WHITE", 6, 5)
+        self.board[6][7] = Piece("WHITE", 6, 7)
 
-        self.board[7][0] = Piece("WHITE")
-        self.board[7][2] = Piece("WHITE")
-        self.board[7][4] = Piece("WHITE")
-        self.board[7][6] = Piece("WHITE")
+        self.board[7][0] = Piece("WHITE", 7, 0)
+        self.board[7][2] = Piece("WHITE", 7, 2)
+        self.board[7][4] = Piece("WHITE", 7, 4)
+        self.board[7][6] = Piece("WHITE", 7, 6)
             
 
     def drawPieces(self): # Drawing pieces on the board using board list
@@ -94,12 +99,30 @@ class Board:
         y = event.y
         row = int(y / TILE_SIZE)
         col = int(x / TILE_SIZE)
-        # print(f"Clicked at: ({x}, {y})")
-        # print(f"Clicked on Row: {row}, Col: {col}")
-        if self.board[row][col] is not None:
-            print(f"Piece at ({row}, {col}) is {self.board[row][col].color}")
+        piece = self.board[row][col]
+        
+        if piece is not None:
+            print(f"Piece at ({row}, {col}) is {piece.color}")
         else:
             print(f"No piece at ({row}, {col})")
+
+    
+
+    def movePiece(self, piece1, destination):
+        oldRow = piece1.row
+        oldCol = piece1.column
+
+        newRow = destination.row
+        newCol = destination.column
+
+        self.board[oldRow][oldCol] = Piece(None, oldRow, oldCol)
+
+        self.board[newRow][newCol] = piece1
+
+        self.canvas.delete("all")
+        self.drawBoard()
+        self.drawPieces()
+
 
     
 
