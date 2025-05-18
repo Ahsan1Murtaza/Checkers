@@ -120,8 +120,6 @@ class Board:
             return
         
 
-        
-
         if self.selectedPiece.color is not None: # if a piece is not none specifically color then we can only move it
             if (self.isValidMove(self.selectedPiece, destination)):
                 self.isValidMovement(self.selectedPiece, destination)
@@ -159,16 +157,20 @@ class Board:
 
     def isValidMove(self, piece1, destination):
         
-        return self.isValidMovement(piece1, destination)
+        return self.isValidMovement(piece1, destination) # it handles both one diagnal move pluss jump over opponent
     
 
     # Pieces can only move forward with respect to their positions
     # can only move diagnally only if there is no piece
+    # if jumping over piece then in middle of its way should be the piece of opponent
+
     def isValidMovement(self, piece1, destination):
         if (piece1.color == "BLACK"):
             steps = 1
         elif (piece1.color == "WHITE"):
             steps = -1
+        else:
+            return
 
         rowChange = destination.row - piece1.row
         colChange = destination.column - piece1.column
@@ -176,9 +178,35 @@ class Board:
         
         rowChange = rowChange * steps
         
-
+        # Moving single step diagnally if destination is none
         if ((rowChange == 1) and (colChange == 1 or colChange == -1) and (destination.color == None)):
             return True
+        
+        # Moving two step diagnally if midPiece is opponent and destination is none
+        if ((rowChange == 2) and (colChange == 2 or colChange == -2) and (destination.color == None)):
+            # Finding mid column
+            if (colChange > 0):
+                # it is positive (rightwards)
+                midColumn = destination.column - 1
+
+            elif (colChange < 0):
+                # it is negative (leftwards)
+                midColumn = destination.column + 1
+            
+            # Finding mid row
+            if (piece1.color == "BLACK"):
+                midRow = destination.row - 1
+
+            elif (piece1.color == "WHITE"):
+                midRow = destination.row + 1
+
+            midPiece = self.board[midRow][midColumn]
+
+            if (not(midPiece.color == None) and not(midPiece.color == piece1.color)):
+
+                # Now make this midPiece Color none
+                self.board[midRow][midColumn] = Piece(None, midRow, midColumn)
+                return True
         
         print("Invalid Piece Movement")
 
