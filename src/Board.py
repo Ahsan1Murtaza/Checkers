@@ -6,6 +6,8 @@ from Piece import Piece
 class Board:
     def __init__(self, master):
         self.master = master
+        
+        self.turn = True # True for White, False for Black
 
         # Creating board
         self.board = [[Piece(None, row, col) for col in range(COLUMNS)] for row in range(ROWS)]
@@ -27,6 +29,8 @@ class Board:
         # Draw pieces
         self.drawPieces()
 
+    def switchTurn(self):
+        self.turn = not(self.turn)
 
     def drawBoard(self):
         for row in range(ROWS):
@@ -121,12 +125,24 @@ class Board:
         
 
         if self.selectedPiece.color is not None: # if a piece is not none specifically color then we can only move it
+            if (self.selectedPiece.color == "BLACK"):
+                if (not(self.turn == False)):
+                    print("Not Black's Turn")
+                    return
+            if (self.selectedPiece.color == "WHITE"):
+                if (not(self.turn == True)):
+                    print("Not White's Turn")
+                    return
+                
             if (self.isValidMove(self.selectedPiece, destination)):
+
                 self.isValidMovement(self.selectedPiece, destination)
-              
             
                 self.movePiece(self.selectedPiece, destination)
+
                 self.selectedPiece = None
+
+                self.switchTurn()
             else:
                 print(f"Invalid move from ({self.selectedPiece.row}, {self.selectedPiece.column}) to ({row}, {col})")
           
@@ -207,8 +223,8 @@ class Board:
                 # Now make this midPiece Color none
                 self.board[midRow][midColumn] = Piece(None, midRow, midColumn)
                 return True
-        
-        print("Invalid Piece Movement")
+        else:
+            print("Invalid Piece Movement")
 
         return False
     
