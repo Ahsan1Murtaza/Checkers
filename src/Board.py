@@ -14,6 +14,7 @@ class Board:
         self.drawBoard()
 
 
+
     def drawBoard(self):
         for row in range(ROWS):
             for col in range(COLUMNS):
@@ -28,4 +29,14 @@ class Board:
 
                 self.canvas.create_rectangle(x1,y1,x2,y2, fill = color)
             
-                 
+    
+
+    def onclick(self, event):
+        x = event.x
+        y = event.y
+        row = int(y / TILE_SIZE)
+        col = int(x / TILE_SIZE)
+        print(f"Clicked at: ({x}, {y})")
+        print(f"Clicked on Row: {row}, Col: {col}")
+
+      

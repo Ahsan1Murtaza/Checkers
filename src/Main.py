@@ -8,7 +8,7 @@ if __name__ == "__main__":
     root.resizable(False, False)
     root.title("Checkers Game")
 
-    Board(root)
-
+    board = Board(root)
+    board.canvas.bind("<Button-1>", board.onclick)
 
     root.mainloop()
