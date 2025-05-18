@@ -7,13 +7,14 @@ class Board:
     def __init__(self, master):
         self.master = master
 
-        # Initialize board
+        # Creating board
         self.board = [[Piece(None, row, col) for col in range(COLUMNS)] for row in range(ROWS)]
         # Create canvas
         self.canvas = tk.Canvas(master, width=COLUMNS * TILE_SIZE, height=ROWS * TILE_SIZE)
         self.canvas.pack()
     
-        self.canvas.bind("<Button-1>", self.onclick)
+        self.canvas.bind("<Button-1>", self.onLeftClick)
+        self.canvas.bind("<Button-3>", self.onRightClick)
 
         self.selectedPiece = None
 
@@ -25,9 +26,6 @@ class Board:
 
         # Draw pieces
         self.drawPieces()
-
-        # self.movePiece(self.board[0][1], self.board[0][0])
-        # self.movePiece(self.board[2][1], self.board[3][1])
 
 
     def drawBoard(self):
@@ -82,7 +80,7 @@ class Board:
         for row in range(ROWS):
             for col in range(COLUMNS):
                 piece = self.board[row][col]
-                if piece is not None:
+                if piece.color is not None:
                     x1 = col * TILE_SIZE
                     y1 = row * TILE_SIZE
                     x2 = x1 + TILE_SIZE
@@ -94,7 +92,7 @@ class Board:
                         self.canvas.create_oval(x1, y1, x2, y2, fill="White")
 
 
-    def onclick(self, event):
+    def onLeftClick(self, event):
         x = event.x
         y = event.y
         row = int(y / TILE_SIZE)
@@ -102,11 +100,26 @@ class Board:
         piece = self.board[row][col]
         
         if piece is not None:
-            print(f"Piece at ({row}, {col}) is {piece.color}")
+            self.selectedPiece = piece
+            print(f"Piece at ({row}, {col}) is {piece.color}") # Debugging line
         else:
-            print(f"No piece at ({row}, {col})")
+            self.selectedPiece = None
+            print(f"No piece at ({row}, {col})") # Debugging line
 
-    
+    def onRightClick(self, event):
+        x = event.x
+        y = event.y
+        row = int(y / TILE_SIZE)
+        col = int(x / TILE_SIZE)
+        destination = self.board[row][col]
+
+        if self.selectedPiece.color is not None: # if a piece is not none specifically color then we can only move it
+            if (self.isValidMove(self.selectedPiece, destination)):
+                self.movePiece(self.selectedPiece, destination)
+                self.selectedPiece = None
+          
+
+
 
     def movePiece(self, piece1, destination):
         oldRow = piece1.row
@@ -115,8 +128,14 @@ class Board:
         newRow = destination.row
         newCol = destination.column
 
-        self.board[oldRow][oldCol] = Piece(None, oldRow, oldCol)
+        print(f"Moving piece from ({oldRow}, {oldCol}) to ({newRow}, {newCol})") # Debugging line
 
+        # Updating the piece's position
+        piece1.row = newRow
+        piece1.column = newCol
+
+        # Updating the board
+        self.board[oldRow][oldCol] = Piece(None, oldRow, oldCol)
         self.board[newRow][newCol] = piece1
 
         self.canvas.delete("all")
@@ -124,6 +143,7 @@ class Board:
         self.drawPieces()
 
 
-    
+    def isValidMove(self, piece1, destination):
+        return True
 
       
