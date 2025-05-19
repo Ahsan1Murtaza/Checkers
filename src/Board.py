@@ -1,3 +1,4 @@
+# import sys
 import tkinter as tk
 
 from config import *
@@ -29,6 +30,7 @@ class Board:
         # Draw pieces
         self.drawPieces()
 
+
     def switchTurn(self):
         self.turn = not(self.turn)
 
@@ -48,20 +50,20 @@ class Board:
 
     def initializeBoard(self): # Internal method to set up the board
         # Black Pieces
-        self.board[0][1] = Piece("BLACK", 0, 1)
-        self.board[0][3] = Piece("BLACK", 0, 3)
-        self.board[0][5] = Piece("BLACK", 0, 5)
-        self.board[0][7] = Piece("BLACK", 0, 7)
+        # self.board[0][1] = Piece("BLACK", 0, 1)
+        # self.board[0][3] = Piece("BLACK", 0, 3)
+        # self.board[0][5] = Piece("BLACK", 0, 5)
+        # self.board[0][7] = Piece("BLACK", 0, 7)
 
-        self.board[1][0] = Piece("BLACK", 1, 0)
-        self.board[1][2] = Piece("BLACK", 1, 2)
-        self.board[1][4] = Piece("BLACK", 1, 4)
-        self.board[1][6] = Piece("BLACK", 1, 6)
+        # self.board[1][0] = Piece("BLACK", 1, 0)
+        # self.board[1][2] = Piece("BLACK", 1, 2)
+        # self.board[1][4] = Piece("BLACK", 1, 4)
+        # self.board[1][6] = Piece("BLACK", 1, 6)
 
-        self.board[2][1] = Piece("BLACK", 2, 1)
-        self.board[2][3] = Piece("BLACK", 2, 3)
-        self.board[2][5] = Piece("BLACK", 2, 5)
-        self.board[2][7] = Piece("BLACK", 2, 7)
+        # self.board[2][1] = Piece("BLACK", 2, 1)
+        # self.board[2][3] = Piece("BLACK", 2, 3)
+        # self.board[2][5] = Piece("BLACK", 2, 5)
+        # self.board[2][7] = Piece("BLACK", 2, 7)
 
         # White Pieces
         self.board[5][0] = Piece("WHITE", 5, 0)
@@ -92,7 +94,7 @@ class Board:
                     color = piece.color
                     if color == "BLACK":
                         if (piece.king):
-                            self.canvas.create_oval(x1, y1, x2, y2, fill="Orange")
+                            self.canvas.create_oval(x1, y1, x2, y2, fill="RED")
                             continue
                         self.canvas.create_oval(x1, y1, x2, y2, fill="Black")
                     elif color == "WHITE":
@@ -176,6 +178,12 @@ class Board:
         self.drawBoard()
         self.drawPieces()
 
+        if (self.checkWin()):
+            print("GAME OVER !")
+            self.canvas.unbind("<Button-1>")
+            self.canvas.unbind("<Button-3>")
+            # sys.exit(0)
+
 
     def isValidMove(self, piece1, destination):
         
@@ -258,11 +266,62 @@ class Board:
             piece1.king = True
 
         return piece1.king
+    
+    def kingMove(self, piece1, destination):
+        if (piece1.color == "BLACK"):
+            steps = 1
+        elif (piece1.color == "WHITE"):
+            steps = -1
+        else:
+            return
+
+        rowChange = destination.row - piece1.row
+        colChange = destination.column - piece1.column
+
+        
+        rowChange = rowChange * steps
+        
+        # Moving single step diagnally if destination is none
+        if ((rowChange == 1 or rowChange == -1) and (colChange == 1 or colChange == -1) and (destination.color == None)):
+            return True
+        
+        # Moving two step diagnally if midPiece is opponent and destination is none
+        if ((rowChange == 2 or rowChange == -2) and (colChange == 2 or colChange == -2) and (destination.color == None)):
+            # Finding mid column
+            if (colChange > 0):
+                # it is positive (rightwards)
+                midColumn = destination.column - 1
+
+            elif (colChange < 0):
+                # it is negative (leftwards)
+                midColumn = destination.column + 1
+            
+            # Finding mid row
+            # if (piece1.color == "BLACK"):
+            midRow = ((destination.row - piece1.row) // 2) + piece1.row
+
+            # elif (piece1.color == "WHITE"):
+                # midRow = destination.row + 1
+
+            midPiece = self.board[midRow][midColumn]
+
+            if (not(midPiece.color == None) and not(midPiece.color == piece1.color)):
+
+                # Now make this midPiece Color none
+                self.board[midRow][midColumn] = Piece(None, midRow, midColumn)
+                return True
+        else:
+            print("Invalid King Movement")
+
 
     def isValidMovement(self, piece1, destination):
 
         self.makeKing(piece1, destination)
-        self.printArray()
+        # self.printArray()
+
+        if (piece1.king):
+            return self.kingMove(piece1, destination)
+        
         return self.singleMove(piece1, destination) or self.jumpMove(piece1, destination)
         
 
@@ -270,6 +329,28 @@ class Board:
         for i in range(8):
             for j in range(8):
                 print(self.board[i][j].color , " is King ", self.board[i][j].king)
+
+
+    def checkWin(self):
+        whiteCount = 0
+        blackCount = 0
+        for col in range(COLUMNS):
+            for row in range(ROWS):
+                piece = self.board[col][row]
+                if (piece.color == "WHITE"):
+                    whiteCount += 1
+                    pass
+                elif (piece.color == "BLACK"):
+                    blackCount += 1
+
+        if (blackCount == 0):
+            print("WHITE WINS")
+            return True
+        elif (whiteCount == 0):
+            print("BLACK WINS")
+            return True
+        
+        return False
         
     
     
