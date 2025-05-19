@@ -91,8 +91,14 @@ class Board:
                     y2 = y1 + TILE_SIZE
                     color = piece.color
                     if color == "BLACK":
+                        if (piece.king):
+                            self.canvas.create_oval(x1, y1, x2, y2, fill="Orange")
+                            continue
                         self.canvas.create_oval(x1, y1, x2, y2, fill="Black")
                     elif color == "WHITE":
+                        if (piece.king):
+                            self.canvas.create_oval(x1, y1, x2, y2, fill="Orange")
+                            continue
                         self.canvas.create_oval(x1, y1, x2, y2, fill="White")
 
 
@@ -180,7 +186,7 @@ class Board:
     # can only move diagnally only if there is no piece
     # if jumping over piece then in middle of its way should be the piece of opponent
 
-    def isValidMovement(self, piece1, destination):
+    def singleMove(self, piece1, destination):
         if (piece1.color == "BLACK"):
             steps = 1
         elif (piece1.color == "WHITE"):
@@ -197,7 +203,21 @@ class Board:
         # Moving single step diagnally if destination is none
         if ((rowChange == 1) and (colChange == 1 or colChange == -1) and (destination.color == None)):
             return True
+      
+    def jumpMove(self, piece1, destination):
+        if (piece1.color == "BLACK"):
+            steps = 1
+        elif (piece1.color == "WHITE"):
+            steps = -1
+        else:
+            return
+
+        rowChange = destination.row - piece1.row
+        colChange = destination.column - piece1.column
+
         
+        rowChange = rowChange * steps
+
         # Moving two step diagnally if midPiece is opponent and destination is none
         if ((rowChange == 2) and (colChange == 2 or colChange == -2) and (destination.color == None)):
             # Finding mid column
@@ -225,8 +245,32 @@ class Board:
                 return True
         else:
             print("Invalid Piece Movement")
+       
 
-        return False
+    def makeKing(self, piece1, destination):
+        color = piece1.color
+        
+        if (color == "BLACK" and destination.row == 7):
+            piece1.king = True
+            print("BLACK BECOMES KING")
+        elif (color == "WHITE" and destination.row == 0):
+            print("WHITE BECOMES KING")
+            piece1.king = True
+
+        return piece1.king
+
+    def isValidMovement(self, piece1, destination):
+
+        self.makeKing(piece1, destination)
+        self.printArray()
+        return self.singleMove(piece1, destination) or self.jumpMove(piece1, destination)
+        
+
+    def printArray(self):
+        for i in range(8):
+            for j in range(8):
+                print(self.board[i][j].color , " is King ", self.board[i][j].king)
+        
     
     
 

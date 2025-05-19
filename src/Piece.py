@@ -3,3 +3,4 @@ class Piece:
         self.color = color
         self.row = row
         self.column = column
+        self.king = False
