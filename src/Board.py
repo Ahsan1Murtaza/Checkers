@@ -50,20 +50,20 @@ class Board:
 
     def initializeBoard(self): # Internal method to set up the board
         # Black Pieces
-        # self.board[0][1] = Piece("BLACK", 0, 1)
-        # self.board[0][3] = Piece("BLACK", 0, 3)
-        # self.board[0][5] = Piece("BLACK", 0, 5)
-        # self.board[0][7] = Piece("BLACK", 0, 7)
+        self.board[0][1] = Piece("BLACK", 0, 1)
+        self.board[0][3] = Piece("BLACK", 0, 3)
+        self.board[0][5] = Piece("BLACK", 0, 5)
+        self.board[0][7] = Piece("BLACK", 0, 7)
 
-        # self.board[1][0] = Piece("BLACK", 1, 0)
-        # self.board[1][2] = Piece("BLACK", 1, 2)
-        # self.board[1][4] = Piece("BLACK", 1, 4)
-        # self.board[1][6] = Piece("BLACK", 1, 6)
+        self.board[1][0] = Piece("BLACK", 1, 0)
+        self.board[1][2] = Piece("BLACK", 1, 2)
+        self.board[1][4] = Piece("BLACK", 1, 4)
+        self.board[1][6] = Piece("BLACK", 1, 6)
 
-        # self.board[2][1] = Piece("BLACK", 2, 1)
-        # self.board[2][3] = Piece("BLACK", 2, 3)
-        # self.board[2][5] = Piece("BLACK", 2, 5)
-        # self.board[2][7] = Piece("BLACK", 2, 7)
+        self.board[2][1] = Piece("BLACK", 2, 1)
+        self.board[2][3] = Piece("BLACK", 2, 3)
+        self.board[2][5] = Piece("BLACK", 2, 5)
+        self.board[2][7] = Piece("BLACK", 2, 7)
 
         # White Pieces
         self.board[5][0] = Piece("WHITE", 5, 0)
@@ -164,11 +164,12 @@ class Board:
         newRow = destination.row
         newCol = destination.column
 
-        print(f"Moving piece from ({oldRow}, {oldCol}) to ({newRow}, {newCol})") # Debugging line
+        # print(f"Moving piece from ({oldRow}, {oldCol}) to ({newRow}, {newCol})") # Debugging line
 
         # Updating the piece's position
         piece1.row = newRow
         piece1.column = newCol
+        piece1.king = self.makeKing(piece1, destination)
 
         # Updating the board
         self.board[oldRow][oldCol] = Piece(None, oldRow, oldCol)
@@ -205,7 +206,6 @@ class Board:
         rowChange = destination.row - piece1.row
         colChange = destination.column - piece1.column
 
-        
         rowChange = rowChange * steps
         
         # Moving single step diagnally if destination is none
@@ -223,28 +223,19 @@ class Board:
         rowChange = destination.row - piece1.row
         colChange = destination.column - piece1.column
 
-        
         rowChange = rowChange * steps
 
         # Moving two step diagnally if midPiece is opponent and destination is none
         if ((rowChange == 2) and (colChange == 2 or colChange == -2) and (destination.color == None)):
             # Finding mid column
-            if (colChange > 0):
-                # it is positive (rightwards)
-                midColumn = destination.column - 1
-
-            elif (colChange < 0):
-                # it is negative (leftwards)
-                midColumn = destination.column + 1
+            midColumn = (piece1.column + destination.column) // 2
             
             # Finding mid row
-            if (piece1.color == "BLACK"):
-                midRow = destination.row - 1
-
-            elif (piece1.color == "WHITE"):
-                midRow = destination.row + 1
+            midRow = (piece1.row + destination.row) // 2
 
             midPiece = self.board[midRow][midColumn]
+            # print("THE MID PIECE IS " , midRow , " : " , midColumn)
+            # print("THE MID PIECE IS " , midPiece.row , " : " , midPiece.column , " and color is " , midPiece.color)
 
             if (not(midPiece.color == None) and not(midPiece.color == piece1.color)):
 
@@ -268,18 +259,9 @@ class Board:
         return piece1.king
     
     def kingMove(self, piece1, destination):
-        if (piece1.color == "BLACK"):
-            steps = 1
-        elif (piece1.color == "WHITE"):
-            steps = -1
-        else:
-            return
 
         rowChange = destination.row - piece1.row
         colChange = destination.column - piece1.column
-
-        
-        rowChange = rowChange * steps
         
         # Moving single step diagnally if destination is none
         if ((rowChange == 1 or rowChange == -1) and (colChange == 1 or colChange == -1) and (destination.color == None)):
@@ -287,23 +269,14 @@ class Board:
         
         # Moving two step diagnally if midPiece is opponent and destination is none
         if ((rowChange == 2 or rowChange == -2) and (colChange == 2 or colChange == -2) and (destination.color == None)):
+    
             # Finding mid column
-            if (colChange > 0):
-                # it is positive (rightwards)
-                midColumn = destination.column - 1
+            midColumn = (piece1.column + destination.column) // 2
+            midRow = (piece1.row + destination.row) // 2
 
-            elif (colChange < 0):
-                # it is negative (leftwards)
-                midColumn = destination.column + 1
-            
-            # Finding mid row
-            # if (piece1.color == "BLACK"):
-            midRow = ((destination.row - piece1.row) // 2) + piece1.row
-
-            # elif (piece1.color == "WHITE"):
-                # midRow = destination.row + 1
-
-            midPiece = self.board[midRow][midColumn]
+            midPiece = self.board[midRow][midColumn] # get the mid piece
+            print("THE KING PIECE IS " , midPiece.row , " : " , midPiece.column , " and color is " , midPiece.color)
+            print("THE KING PIECE IS " , midRow , " : " , midColumn , " and color is " , midPiece.color)
 
             if (not(midPiece.color == None) and not(midPiece.color == piece1.color)):
 
@@ -316,8 +289,9 @@ class Board:
 
     def isValidMovement(self, piece1, destination):
 
-        self.makeKing(piece1, destination)
+        # self.makeKing(piece1, destination)
         # self.printArray()
+        # print("ARRAY ENDED **************************************")
 
         if (piece1.king):
             return self.kingMove(piece1, destination)
@@ -328,7 +302,7 @@ class Board:
     def printArray(self):
         for i in range(8):
             for j in range(8):
-                print(self.board[i][j].color , " is King ", self.board[i][j].king)
+                print(self.board[i][j].color , " is King ", self.board[i][j].king, "Row : " , self.board[i][j].row, " Column : " , self.board[i][j].column)
 
 
     def checkWin(self):
