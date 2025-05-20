@@ -164,7 +164,11 @@ class Board:
         newRow = destination.row
         newCol = destination.column
 
-        # print(f"Moving piece from ({oldRow}, {oldCol}) to ({newRow}, {newCol})") # Debugging line
+        # Check if it was a jump Move so to make it's mid piece color none
+        if (abs(newRow - oldRow) == 2 and abs(newCol - oldCol)):
+            midRow = (oldRow + newRow) // 2
+            midCol = (oldCol + newCol) // 2
+            self.board[midRow][midCol] = Piece(None, midRow, midCol)
 
         # Updating the piece's position
         piece1.row = newRow
@@ -218,11 +222,10 @@ class Board:
         elif (piece1.color == "WHITE"):
             steps = -1
         else:
-            return
+            return False
 
         rowChange = destination.row - piece1.row
         colChange = destination.column - piece1.column
-
         rowChange = rowChange * steps
 
         # Moving two step diagnally if midPiece is opponent and destination is none
@@ -234,16 +237,10 @@ class Board:
             midRow = (piece1.row + destination.row) // 2
 
             midPiece = self.board[midRow][midColumn]
-            # print("THE MID PIECE IS " , midRow , " : " , midColumn)
-            # print("THE MID PIECE IS " , midPiece.row , " : " , midPiece.column , " and color is " , midPiece.color)
 
-            if (not(midPiece.color == None) and not(midPiece.color == piece1.color)):
+            return (not(midPiece.color == None) and not(midPiece.color == piece1.color))
 
-                # Now make this midPiece Color none
-                self.board[midRow][midColumn] = Piece(None, midRow, midColumn)
-                return True
-        else:
-            print("Invalid Piece Movement")
+        return False
        
 
     def makeKing(self, piece1, destination):
@@ -263,11 +260,11 @@ class Board:
         rowChange = destination.row - piece1.row
         colChange = destination.column - piece1.column
         
-        # Moving single step diagnally if destination is none
+        # Diagonal Single move
         if ((rowChange == 1 or rowChange == -1) and (colChange == 1 or colChange == -1) and (destination.color == None)):
             return True
         
-        # Moving two step diagnally if midPiece is opponent and destination is none
+        # Diagonal Jump Move 
         if ((rowChange == 2 or rowChange == -2) and (colChange == 2 or colChange == -2) and (destination.color == None)):
     
             # Finding mid column
@@ -275,23 +272,13 @@ class Board:
             midRow = (piece1.row + destination.row) // 2
 
             midPiece = self.board[midRow][midColumn] # get the mid piece
-            print("THE KING PIECE IS " , midPiece.row , " : " , midPiece.column , " and color is " , midPiece.color)
-            print("THE KING PIECE IS " , midRow , " : " , midColumn , " and color is " , midPiece.color)
 
-            if (not(midPiece.color == None) and not(midPiece.color == piece1.color)):
+            return (not(midPiece.color == None) and not(midPiece.color == piece1.color))
 
-                # Now make this midPiece Color none
-                self.board[midRow][midColumn] = Piece(None, midRow, midColumn)
-                return True
-        else:
-            print("Invalid King Movement")
+        return False
 
 
     def isValidMovement(self, piece1, destination):
-
-        # self.makeKing(piece1, destination)
-        # self.printArray()
-        # print("ARRAY ENDED **************************************")
 
         if (piece1.king):
             return self.kingMove(piece1, destination)
