@@ -30,6 +30,8 @@ class Board:
         # Draw pieces
         self.drawPieces()
 
+        self.possibleMoves = [[0 for col in range(COLUMNS)] for row in range(ROWS)]
+
 
     def switchTurn(self):
         self.turn = not(self.turn)
@@ -105,18 +107,32 @@ class Board:
 
 
     def onLeftClick(self, event):
+
+        self.possibleMoves = [[0 for col in range(COLUMNS)] for row in range(ROWS)]
+
         x = event.x
         y = event.y
         row = int(y / TILE_SIZE)
         col = int(x / TILE_SIZE)
         piece = self.board[row][col]
         
-        if piece is not None:
+        if piece.color is not None:
             self.selectedPiece = piece
+            self.calculatePossibleMoves(piece)
+            self.canvas.delete("all")
+            self.drawBoard()
+            self.drawPieces()
+            self.highlightMoves()
+            
             print(f"Piece at ({row}, {col}) is {piece.color}") # Debugging line
       
         else:
             self.selectedPiece = None
+            self.calculatePossibleMoves(piece)
+            self.canvas.delete("all")
+            self.drawBoard()
+            self.drawPieces()
+            self.highlightMoves()
             print(f"No piece at ({row}, {col})") # Debugging line
 
         
@@ -314,6 +330,26 @@ class Board:
         return False
         
     
+    def calculatePossibleMoves(self, piece):
+        if (piece.color == "BLACK" and self.turn == 1) or (piece.color == "WHITE" and self.turn == 0):
+            return
+        for row in range(8):
+            for col in range(8):
+                temp = self.board[row][col]
+
+                if (temp.color is None and self.isValidMove(piece, temp)):
+                    self.possibleMoves[row][col] = 1
+
+
+    def highlightMoves(self):
+        for row in range(8):
+            for col in range(8):
+                if (self.possibleMoves[row][col] == 1):
+                    x1 = col * TILE_SIZE
+                    y1 = row * TILE_SIZE
+                    x2 = x1 + TILE_SIZE
+                    y2 = y1 + TILE_SIZE
+                    self.canvas.create_oval(x1,y1,x2,y2, fill = "Yellow")
     
 
 
